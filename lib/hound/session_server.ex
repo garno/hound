@@ -16,8 +16,16 @@ defmodule Hound.SessionServer do
 
 
   def current_session_id(pid) do
-    case :ets.lookup(@name, pid) do
+    :ets.lookup(@name, pid)
+    |> case  do
       [{^pid, _ref, session_id, _all_sessions}] -> session_id
+      [] -> nil
+    end
+  end
+
+  def current_session_host(pid) do
+    case :ets.lookup(@name, pid) do
+      [{^pid, _ref, _, %{default: {_session_id, host}}}] -> host
       [] -> nil
     end
   end
@@ -76,7 +84,7 @@ defmodule Hound.SessionServer do
           {session_id, sessions}
         :error ->
           session_id = create_session(driver_info, opts)
-          {session_id, Map.put(sessions, session_name, session_id)}
+          {session_id, Map.put(sessions, session_name, {session_id, opts[:host]})}
       end
 
     :ets.insert(@name, {pid, ref, session_id, sessions})
@@ -105,8 +113,8 @@ defmodule Hound.SessionServer do
   defp destroy_sessions(pid) do
     sessions = all_sessions_for_pid(pid)
     :ets.delete(@name, pid)
-    Enum.each sessions, fn({_session_name, session_id})->
-      Hound.Session.destroy_session(session_id)
+    Enum.each sessions, fn({_session_name, {session_id, host}})->
+      Hound.Session.destroy_session(session_id, host)
     end
   end
 

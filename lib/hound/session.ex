@@ -22,6 +22,7 @@ defmodule Hound.Session do
   def create_session(browser, opts) do
     capabilities = make_capabilities(browser, opts)
     params = %{
+      host: opts[:host],
       desiredCapabilities: capabilities
     }
 
@@ -54,9 +55,9 @@ defmodule Hound.Session do
 
 
   @doc "Destroy a session"
-  @spec destroy_session(String.t) :: :ok
-  def destroy_session(session_id) do
-    make_req(:delete, "session/#{session_id}")
+  @spec destroy_session(String.t, String.t) :: :ok
+  def destroy_session(session_id, host) do
+    make_req(:delete, "session/#{session_id}", %{host: host})
   end
 
 

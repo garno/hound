@@ -24,7 +24,7 @@ defmodule Hound.RequestUtils do
   end
 
   defp send_req(type, path, params, options) do
-    url = get_url(path)
+    url = get_url(path, params)
     has_body = params != %{} && type == :post
     {headers, body} = cond do
        has_body && options[:json_encode] != false ->
@@ -79,14 +79,12 @@ defmodule Hound.RequestUtils do
     end
   end
 
-  defp get_url(path) do
+  defp get_url(path, opts) do
     {:ok, driver_info} = Hound.driver_info
 
-    host = driver_info[:host]
-    port = driver_info[:port]
     path_prefix = driver_info[:path_prefix]
 
-    "#{host}:#{port}/#{path_prefix}#{path}"
+    "#{opts[:host] || Hound.current_session_host}/#{path_prefix}#{path}"
   end
 
   defp http_options() do

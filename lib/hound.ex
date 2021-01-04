@@ -30,4 +30,7 @@ defmodule Hound do
 
   @doc false
   defdelegate current_session_id, to: Hound.Helpers.Session
+
+  @doc false
+  defdelegate current_session_host, to: Hound.Helpers.Session
 end

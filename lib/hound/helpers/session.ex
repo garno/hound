@@ -114,6 +114,11 @@ defmodule Hound.Helpers.Session do
       raise "could not find a session for process #{inspect self()}"
   end
 
+  @doc false
+  def current_session_host do
+    Hound.SessionServer.current_session_host(self()) ||
+      raise "could not find a session for process #{inspect self()}"
+  end
 
   @doc false
   def current_session_name do
